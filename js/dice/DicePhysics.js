@@ -49,12 +49,14 @@ export class DicePhysics {
         });
         this.world.addBody(this.floorBody);
 
-        // 벽
+        // 벽 (높이를 5로 증가하여 주사위가 밖으로 튀어나가지 않도록 함)
+        // 렌더링 벽은 낮게 유지되므로 시각적으로는 보이지 않는 투명 벽 역할
+        const wallHeight = 5;
         const wallConfigs = [
-            { pos: new CANNON.Vec3(0, 0.5, -5), size: new CANNON.Vec3(5, 0.75, 0.25) },
-            { pos: new CANNON.Vec3(0, 0.5, 5), size: new CANNON.Vec3(5, 0.75, 0.25) },
-            { pos: new CANNON.Vec3(-5, 0.5, 0), size: new CANNON.Vec3(0.25, 0.75, 5) },
-            { pos: new CANNON.Vec3(5, 0.5, 0), size: new CANNON.Vec3(0.25, 0.75, 5) }
+            { pos: new CANNON.Vec3(0, wallHeight / 2, -5), size: new CANNON.Vec3(5, wallHeight / 2, 0.25) },
+            { pos: new CANNON.Vec3(0, wallHeight / 2, 5), size: new CANNON.Vec3(5, wallHeight / 2, 0.25) },
+            { pos: new CANNON.Vec3(-5, wallHeight / 2, 0), size: new CANNON.Vec3(0.25, wallHeight / 2, 5) },
+            { pos: new CANNON.Vec3(5, wallHeight / 2, 0), size: new CANNON.Vec3(0.25, wallHeight / 2, 5) }
         ];
 
         wallConfigs.forEach(({ pos, size }) => {
