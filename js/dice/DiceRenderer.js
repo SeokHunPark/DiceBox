@@ -20,10 +20,10 @@ export class DiceRenderer {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x1a1a2e);
 
-        // Camera - 모바일에서도 트레이 전체가 보이도록 위치 조정
+        // Camera
         const aspect = window.innerWidth / window.innerHeight;
         this.camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 100);
-        this.camera.position.set(0, 15, 8);
+        this.adjustCameraForAspect(aspect);
         this.camera.lookAt(0, 0, 0);
 
         // Renderer
@@ -44,6 +44,22 @@ export class DiceRenderer {
 
         // Resize handler
         window.addEventListener('resize', () => this.onResize());
+    }
+
+    /**
+     * 화면 비율에 따라 카메라 위치 조정 (모바일 세로 화면 대응)
+     */
+    adjustCameraForAspect(aspect) {
+        if (aspect < 1) {
+            // 세로 화면 (모바일) - 카메라를 더 높이 올리고 뒤로 빼서 전체 뷰
+            const heightMultiplier = 1 / aspect;
+            const cameraY = Math.min(22, 12 + heightMultiplier * 3);
+            const cameraZ = Math.min(14, 6 + heightMultiplier * 2);
+            this.camera.position.set(0, cameraY, cameraZ);
+        } else {
+            // 가로 화면 (데스크톱)
+            this.camera.position.set(0, 14, 10);
+        }
     }
 
     setupLights() {
@@ -253,8 +269,11 @@ export class DiceRenderer {
     onResize() {
         const width = window.innerWidth;
         const height = window.innerHeight;
+        const aspect = width / height;
 
-        this.camera.aspect = width / height;
+        this.camera.aspect = aspect;
+        this.adjustCameraForAspect(aspect);
+        this.camera.lookAt(0, 0, 0);
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
     }
