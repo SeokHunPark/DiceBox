@@ -136,10 +136,45 @@ export class DicePhysics {
     }
 
     /**
+     * 주사위가 트레이 범위 밖에 있는지 확인
+     * @param {CANNON.Body} body
+     * @returns {boolean}
+     */
+    isOutOfBounds(body) {
+        const pos = body.position;
+        return pos.y < -5 || Math.abs(pos.x) > 7 || Math.abs(pos.z) > 7;
+    }
+
+    /**
+     * 범위 밖 주사위를 트레이 안으로 리셋
+     */
+    resetOutOfBoundsDice() {
+        this.diceBodies.forEach(body => {
+            if (this.isOutOfBounds(body)) {
+                // 트레이 중앙 위로 리셋
+                body.position.set(
+                    (Math.random() - 0.5) * 2,
+                    3 + Math.random() * 2,
+                    (Math.random() - 0.5) * 2
+                );
+                body.velocity.set(0, -5, 0);
+                body.angularVelocity.set(
+                    Math.random() * 5,
+                    Math.random() * 5,
+                    Math.random() * 5
+                );
+                body.wakeUp();
+            }
+        });
+    }
+
+    /**
      * 모든 주사위가 정지했는지 확인
      * @returns {boolean}
      */
     allDiceStopped() {
+        // 범위 밖 주사위가 있으면 리셋
+        this.resetOutOfBoundsDice();
         return this.diceBodies.every(body => body.sleepState === CANNON.Body.SLEEPING);
     }
 

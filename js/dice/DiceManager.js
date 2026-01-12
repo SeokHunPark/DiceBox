@@ -32,6 +32,8 @@ export class DiceManager {
             // 기존 주사위 제거
             this.clear();
             this.isRolling = true;
+            this.rollStartTime = Date.now();
+            this.maxRollTime = 10000; // 10초 타임아웃
 
             // 주사위 생성
             for (let i = 0; i < count; i++) {
@@ -72,6 +74,14 @@ export class DiceManager {
 
         // 렌더링
         this.renderer.render();
+
+        // 타임아웃 체크 (10초 초과 시 강제 종료)
+        const elapsed = Date.now() - this.rollStartTime;
+        if (elapsed > this.maxRollTime) {
+            console.warn('Roll timeout - forcing result');
+            this.stopRolling();
+            return;
+        }
 
         // 모든 주사위가 정지했는지 확인
         if (this.physics.allDiceStopped()) {

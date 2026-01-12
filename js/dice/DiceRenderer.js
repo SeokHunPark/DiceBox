@@ -20,10 +20,10 @@ export class DiceRenderer {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x1a1a2e);
 
-        // Camera
+        // Camera - 모바일에서도 트레이 전체가 보이도록 위치 조정
         const aspect = window.innerWidth / window.innerHeight;
-        this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
-        this.camera.position.set(0, 12, 10);
+        this.camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 100);
+        this.camera.position.set(0, 15, 8);
         this.camera.lookAt(0, 0, 0);
 
         // Renderer
@@ -131,10 +131,24 @@ export class DiceRenderer {
     }
 
     /**
+     * 색상이 밝은지 판단 (눈금 색상 결정용)
+     */
+    isLightColor(hexColor) {
+        const hex = hexColor.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        // 밝기 계산 (YIQ 공식)
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness > 150;
+    }
+
+    /**
      * D6 각 면의 머티리얼 생성 (눈금 표시)
      */
     createDiceMaterials(baseColor) {
         const faceValues = [2, 5, 3, 4, 1, 6]; // Three.js face order: +X, -X, +Y, -Y, +Z, -Z
+        const dotColor = this.isLightColor(baseColor) ? '#222222' : '#ffffff';
 
         return faceValues.map(value => {
             const canvas = document.createElement('canvas');
@@ -151,8 +165,8 @@ export class DiceRenderer {
             ctx.lineWidth = 4;
             ctx.strokeRect(4, 4, 120, 120);
 
-            // 눈금 그리기
-            ctx.fillStyle = '#ffffff';
+            // 눈금 그리기 (밝은 색상은 검은 눈금)
+            ctx.fillStyle = dotColor;
             this.drawDiceDots(ctx, value, 128);
 
             const texture = new THREE.CanvasTexture(canvas);
