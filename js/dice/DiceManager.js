@@ -1,0 +1,128 @@
+import { DiceRenderer } from './DiceRenderer.js';
+import { DicePhysics } from './DicePhysics.js';
+
+/**
+ * DiceManager - 렌더러와 물리 엔진 통합 관리
+ */
+export class DiceManager {
+    constructor(canvas) {
+        this.renderer = new DiceRenderer(canvas);
+        this.physics = new DicePhysics();
+        this.diceData = []; // { mesh, body } 쌍
+        this.isRolling = false;
+        this.animationId = null;
+        this.onRollComplete = null;
+        this.diceColor = '#e74c3c';
+    }
+
+    /**
+     * 주사위 색상 설정
+     */
+    setDiceColor(color) {
+        this.diceColor = color;
+    }
+
+    /**
+     * 주사위 던지기 시작
+     * @param {number} count - 주사위 개수
+     * @returns {Promise<number[]>} 결과 배열
+     */
+    roll(count) {
+        return new Promise((resolve) => {
+            // 기존 주사위 제거
+            this.clear();
+            this.isRolling = true;
+
+            // 주사위 생성
+            for (let i = 0; i < count; i++) {
+                const mesh = this.renderer.createDiceMesh(this.diceColor);
+                const body = this.physics.createDiceBody();
+
+                // 초기 위치 동기화
+                mesh.position.copy(body.position);
+                mesh.quaternion.copy(body.quaternion);
+
+                // 던지기 힘 적용
+                this.physics.throwDice(body);
+
+                this.diceData.push({ mesh, body });
+            }
+
+            // 애니메이션 루프 시작
+            this.onRollComplete = resolve;
+            this.animate();
+        });
+    }
+
+    /**
+     * 애니메이션 루프
+     */
+    animate() {
+        if (!this.isRolling) return;
+
+        this.animationId = requestAnimationFrame(() => this.animate());
+
+        // 물리 시뮬레이션 업데이트
+        this.physics.step();
+
+        // 메시 위치 동기화
+        this.diceData.forEach(({ mesh, body }) => {
+            this.renderer.updateDiceMesh(mesh, body.position, body.quaternion);
+        });
+
+        // 렌더링
+        this.renderer.render();
+
+        // 모든 주사위가 정지했는지 확인
+        if (this.physics.allDiceStopped()) {
+            this.stopRolling();
+        }
+    }
+
+    /**
+     * 굴리기 중지 및 결과 반환
+     */
+    stopRolling() {
+        this.isRolling = false;
+
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+            this.animationId = null;
+        }
+
+        // 결과 계산
+        const results = this.physics.getAllResults();
+
+        if (this.onRollComplete) {
+            // 약간의 딜레이 후 결과 반환 (시각적 안정화)
+            setTimeout(() => {
+                this.onRollComplete(results);
+                this.onRollComplete = null;
+            }, 500);
+        }
+    }
+
+    /**
+     * 주사위 제거
+     */
+    clear() {
+        this.isRolling = false;
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+            this.animationId = null;
+        }
+
+        this.renderer.clearDice();
+        this.physics.clearDice();
+        this.diceData = [];
+    }
+
+    /**
+     * 리소스 해제
+     */
+    dispose() {
+        this.clear();
+        this.renderer.dispose();
+        this.physics.dispose();
+    }
+}
