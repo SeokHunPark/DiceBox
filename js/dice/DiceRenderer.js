@@ -20,10 +20,11 @@ export class DiceRenderer {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x1a1a2e);
 
-        // Camera
+        // Camera - OrthographicCamera 사용으로 트레이가 항상 완전히 보임
+        this.traySize = 6; // 트레이 뷰 영역 (약간의 여백 포함)
         const aspect = window.innerWidth / window.innerHeight;
-        this.camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 100);
-        this.adjustCameraForAspect(aspect);
+        this.camera = this.createOrthographicCamera(aspect);
+        this.camera.position.set(0, 15, 8);
         this.camera.lookAt(0, 0, 0);
 
         // Renderer
@@ -47,18 +48,44 @@ export class DiceRenderer {
     }
 
     /**
-     * 화면 비율에 따라 카메라 위치 조정 (모바일 세로 화면 대응)
+     * OrthographicCamera 생성 - 화면 비율에 맞춰 트레이가 항상 완전히 보이도록 설정
+     */
+    createOrthographicCamera(aspect) {
+        let left, right, top, bottom;
+
+        if (aspect >= 1) {
+            // 가로 화면 (데스크톱) - 높이 기준으로 맞춤
+            left = -this.traySize * aspect;
+            right = this.traySize * aspect;
+            top = this.traySize;
+            bottom = -this.traySize;
+        } else {
+            // 세로 화면 (모바일) - 너비 기준으로 맞춤
+            left = -this.traySize;
+            right = this.traySize;
+            top = this.traySize / aspect;
+            bottom = -this.traySize / aspect;
+        }
+
+        return new THREE.OrthographicCamera(left, right, top, bottom, 0.1, 100);
+    }
+
+    /**
+     * 화면 비율에 따라 카메라 frustum 조정
      */
     adjustCameraForAspect(aspect) {
-        if (aspect < 1) {
-            // 세로 화면 (모바일) - 카메라를 더 높이 올리고 뒤로 빼서 전체 뷰
-            const heightMultiplier = 1 / aspect;
-            const cameraY = Math.min(22, 12 + heightMultiplier * 3);
-            const cameraZ = Math.min(14, 6 + heightMultiplier * 2);
-            this.camera.position.set(0, cameraY, cameraZ);
-        } else {
+        if (aspect >= 1) {
             // 가로 화면 (데스크톱)
-            this.camera.position.set(0, 14, 10);
+            this.camera.left = -this.traySize * aspect;
+            this.camera.right = this.traySize * aspect;
+            this.camera.top = this.traySize;
+            this.camera.bottom = -this.traySize;
+        } else {
+            // 세로 화면 (모바일)
+            this.camera.left = -this.traySize;
+            this.camera.right = this.traySize;
+            this.camera.top = this.traySize / aspect;
+            this.camera.bottom = -this.traySize / aspect;
         }
     }
 
