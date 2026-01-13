@@ -115,6 +115,25 @@ class DiceBoxApp {
             this.hideResultOverlay();
             this.sceneManager.switchTo('start');
         });
+
+        // 결과 상세 보기 토글
+        const toggleBtn = document.getElementById('toggle-detail-btn');
+        const diceGroups = document.getElementById('dice-groups');
+
+        if (toggleBtn && diceGroups) {
+            toggleBtn.addEventListener('click', () => {
+                const isCollapsed = diceGroups.classList.contains('collapsed');
+                if (isCollapsed) {
+                    diceGroups.classList.remove('collapsed');
+                    toggleBtn.classList.add('expanded');
+                    soundManager.playButtonSound(); // 토글음
+                } else {
+                    diceGroups.classList.add('collapsed');
+                    toggleBtn.classList.remove('expanded');
+                    soundManager.playButtonSound(); // 토글음
+                }
+            });
+        }
     }
 
     /**
@@ -144,6 +163,14 @@ class DiceBoxApp {
      */
     showResults(results) {
         this.resultUI.displayResults(results);
+
+        // 결과 표시 시 상세 내역 기본 펼침
+        const diceGroups = document.getElementById('dice-groups');
+        const toggleBtn = document.getElementById('toggle-detail-btn');
+
+        if (diceGroups) diceGroups.classList.remove('collapsed');
+        if (toggleBtn) toggleBtn.classList.add('expanded');
+
         this.resultOverlay.classList.add('visible');
     }
 

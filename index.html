@@ -80,15 +80,20 @@
     <!-- 결과 오버레이 (주사위 위에 표시) -->
     <div id="result-overlay" class="result-overlay">
       <div class="result-card glass">
-        <h2 class="result-title" data-i18n="result">결과</h2>
+        <div class="result-card glass">
+          <div class="result-header">
+            <div class="total-container">
+              <span class="total-label" data-i18n="total">합계</span>
+              <span id="total-value" class="total-value">0</span>
+            </div>
+            <button id="toggle-detail-btn" class="toggle-btn" aria-label="Toggle Details">
+              <span class="toggle-icon">▼</span>
+            </button>
+          </div>
 
-        <div class="total-container">
-          <span class="total-label" data-i18n="total">합계</span>
-          <span id="total-value" class="total-value">0</span>
-        </div>
-
-        <div id="dice-groups" class="dice-groups">
-          <!-- 눈금별 그룹이 동적으로 추가됨 -->
+          <div id="dice-groups" class="dice-groups">
+            <!-- 눈금별 그룹이 동적으로 추가됨 -->
+          </div>
         </div>
       </div>
 
@@ -103,7 +108,7 @@
     </div>
   </section>
 
-  <script type="module" src="js/main.js?v=8"></script>
+  <script type="module" src="js/main.js?v=10"></script>
 </body>
 
 </html>
