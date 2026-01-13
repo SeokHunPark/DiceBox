@@ -166,6 +166,7 @@ DiceBoxWeb/
 - 함수: 화살표 함수 권장
 - 네이밍: camelCase 사용
 - 클래스: PascalCase 사용
+- 주석 : 함수, 클래스, 변수, 상수에 대한 자세한 설명
 
 #### CSS
 - 클래스 네이밍: BEM 방식 (`block__element--modifier`)
