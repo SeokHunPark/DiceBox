@@ -59,8 +59,8 @@ class DiceBoxApp {
         this.initStartUI();
         this.initResultUI();
 
-        // 흔들기 감지 시작
-        this.initShakeDetection();
+        // 흔들기 감지 시작 (현재 비활성화 요청으로 주석 처리)
+        // this.initShakeDetection();
 
         console.log('🎲 Dice Box initialized!');
     }
