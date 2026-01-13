@@ -10,6 +10,9 @@ export class DicePhysics {
         this.floorBody = null;
         this.wallBodies = [];
 
+        /** @type {Function|null} 충돌 콜백 함수 */
+        this.onCollision = null;
+
         // D6 면의 로컬 법선 벡터와 눈금 매핑
         // Three.js BoxGeometry face order: +X, -X, +Y, -Y, +Z, -Z
         this.faceNormals = [
@@ -35,8 +38,58 @@ export class DicePhysics {
         // Broadphase
         this.world.broadphase = new CANNON.SAPBroadphase(this.world);
 
+        // 충돌 이벤트 리스너
+        this.world.addEventListener('collide', (event) => this.handleCollision(event));
+
         // 트레이(바닥 + 벽) 생성
         this.createTray();
+    }
+
+    /**
+     * 충돌 콜백 함수 설정
+     * @param {Function} callback - (type: 'dice'|'floor'|'wall', velocity: number, x: number) => void
+     */
+    setOnCollision(callback) {
+        this.onCollision = callback;
+    }
+
+    /**
+     * 충돌 이벤트 처리
+     */
+    handleCollision(event) {
+        if (!this.onCollision) return;
+
+        const { bodyA, bodyB, contact } = event;
+
+        // 충돌 속도 계산
+        const velocity = contact.getImpactVelocityAlongNormal();
+        const absVelocity = Math.abs(velocity);
+
+        // 충돌 위치 (X 좌표, 스테레오 패닝용)
+        const contactPoint = contact.bi.position;
+        const x = contactPoint.x;
+
+        // 충돌 유형 판별
+        let collisionType = null;
+
+        const isDiceA = this.diceBodies.includes(bodyA);
+        const isDiceB = this.diceBodies.includes(bodyB);
+        const isFloorA = bodyA === this.floorBody;
+        const isFloorB = bodyB === this.floorBody;
+        const isWallA = this.wallBodies.includes(bodyA);
+        const isWallB = this.wallBodies.includes(bodyB);
+
+        if (isDiceA && isDiceB) {
+            collisionType = 'dice';
+        } else if ((isDiceA || isDiceB) && (isFloorA || isFloorB)) {
+            collisionType = 'floor';
+        } else if ((isDiceA || isDiceB) && (isWallA || isWallB)) {
+            collisionType = 'wall';
+        }
+
+        if (collisionType) {
+            this.onCollision(collisionType, absVelocity, x);
+        }
     }
 
     createTray() {

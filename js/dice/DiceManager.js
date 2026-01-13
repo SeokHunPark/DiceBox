@@ -1,5 +1,6 @@
 import { DiceRenderer } from './DiceRenderer.js';
 import { DicePhysics } from './DicePhysics.js';
+import { soundManager } from '../audio/SoundManager.js';
 
 /**
  * DiceManager - 렌더러와 물리 엔진 통합 관리
@@ -13,6 +14,11 @@ export class DiceManager {
         this.animationId = null;
         this.onRollComplete = null;
         this.diceColor = '#e74c3c';
+
+        // 물리 충돌 → 사운드 재생 연결
+        this.physics.setOnCollision((type, velocity, x) => {
+            soundManager.playCollision(type, velocity, x);
+        });
     }
 
     /**

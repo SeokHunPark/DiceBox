@@ -8,6 +8,7 @@ import { DiceManager } from './dice/DiceManager.js';
 import { StartUI } from './ui/StartUI.js';
 import { ResultUI } from './ui/ResultUI.js';
 import { i18n } from './i18n/i18n.js';
+import { soundManager } from './audio/SoundManager.js';
 
 class DiceBoxApp {
     constructor() {
@@ -33,6 +34,9 @@ class DiceBoxApp {
         // 언어 선택 드롭다운 이벤트 연결
         this.initLanguageSelector();
 
+        // 사운드 매니저 초기화 (사용자 인터랙션 전 준비)
+        this.initSound();
+
         // Manager 초기화
         this.sceneManager = new SceneManager();
 
@@ -46,6 +50,23 @@ class DiceBoxApp {
         this.initResultUI();
 
         console.log('🎲 Dice Box initialized!');
+    }
+
+    /**
+     * 사운드 매니저 초기화
+     * 첫 사용자 인터랙션 시 AudioContext 활성화
+     */
+    initSound() {
+        const activateSound = () => {
+            soundManager.init();
+            soundManager.resume();
+            // 한 번만 실행
+            document.removeEventListener('click', activateSound);
+            document.removeEventListener('touchstart', activateSound);
+        };
+
+        document.addEventListener('click', activateSound);
+        document.addEventListener('touchstart', activateSound);
     }
 
     /**
