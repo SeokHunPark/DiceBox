@@ -303,6 +303,7 @@ export class DiceRenderer {
         this.camera.lookAt(0, 0, 0);
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
+        this.render(); // 루프가 멈춘 상태에서도 리사이즈 시 화면 다시 그리기
     }
 
     dispose() {
