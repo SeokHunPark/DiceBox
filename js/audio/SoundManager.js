@@ -177,6 +177,57 @@ export class SoundManager {
     }
 
     /**
+     * Roll 버튼 효과음 (밝은 "딩" 소리)
+     */
+    playRollButtonSound() {
+        if (!this.enabled || !this.initialized || !this.audioContext) return;
+
+        const ctx = this.audioContext;
+        const now = ctx.currentTime;
+
+        // 오실레이터로 깔끔한 톤 생성
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now); // A5
+        osc.frequency.exponentialRampToValueAtTime(1320, now + 0.05); // E6로 올라감
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.15);
+    }
+
+    /**
+     * Home/일반 버튼 효과음 (부드러운 "톡" 소리)
+     */
+    playButtonSound() {
+        if (!this.enabled || !this.initialized || !this.audioContext) return;
+
+        const ctx = this.audioContext;
+        const now = ctx.currentTime;
+
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(400, now + 0.08);
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.1);
+    }
+
+    /**
      * 사운드 활성화/비활성화
      */
     setEnabled(enabled) {
