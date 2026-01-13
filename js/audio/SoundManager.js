@@ -359,6 +359,20 @@ export class SoundManager {
      */
     setEnabled(enabled) {
         this.enabled = enabled;
+        if (!enabled && this.audioContext) {
+            this.audioContext.suspend();
+        } else if (enabled && this.audioContext) {
+            this.audioContext.resume();
+        }
+    }
+
+    /**
+     * 음소거 토글
+     * @returns {boolean} 현재 활성화 상태
+     */
+    toggleMute() {
+        this.setEnabled(!this.enabled);
+        return this.enabled;
     }
 
     /**

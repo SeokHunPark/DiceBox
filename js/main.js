@@ -99,6 +99,16 @@ class DiceBoxApp {
             this.startRolling();
         });
 
+        // 음소거 버튼 이벤트 연결
+        const muteBtn = document.getElementById('mute-btn');
+        if (muteBtn) {
+            muteBtn.addEventListener('click', () => {
+                const isEnabled = soundManager.toggleMute();
+                muteBtn.textContent = isEnabled ? '🔊' : '🔇';
+                muteBtn.classList.toggle('muted', !isEnabled);
+            });
+        }
+
         // 트레이 테마 선택 버튼 이벤트 연결
         const themeBtns = document.querySelectorAll('.theme-btn');
         themeBtns.forEach(btn => {

@@ -26,7 +26,10 @@
   <section id="start-scene" class="scene active">
     <div class="scene-content">
       <!-- 언어 선택 드롭다운 -->
-      <div class="lang-selector-container">
+      <div class="lang-selector-container" style="display: flex; gap: 10px;">
+        <button id="mute-btn" class="icon-btn" aria-label="Toggle Sound">
+          🔊
+        </button>
         <select id="lang-selector" class="lang-selector">
           <option value="ko">한국어</option>
           <option value="en">English</option>
