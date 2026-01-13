@@ -135,6 +135,8 @@ export class DiceRenderer {
             metalness: 0.3
         });
 
+        this.wallMeshes = []; // 테마 변경을 위해 저장
+
         const wallPositions = [
             { pos: [0, 0.5, -5], size: [10, 1.5, 0.5] },
             { pos: [0, 0.5, 5], size: [10, 1.5, 0.5] },
@@ -149,7 +151,47 @@ export class DiceRenderer {
             wall.receiveShadow = true;
             wall.castShadow = true;
             this.scene.add(wall);
+            this.wallMeshes.push(wall);
         });
+    }
+
+    /**
+     * 트레이 테마 변경
+     * @param {'default'|'wood'} themeName 
+     */
+    setTheme(themeName) {
+        const themes = {
+            default: {
+                floorColor: 0x2c3e50,
+                wallColor: 0x34495e,
+                roughness: 0.8,
+                metalness: 0.2
+            },
+            wood: {
+                floorColor: 0x5d4037, // 갈색
+                wallColor: 0x4e342e,  // 더 진한 갈색
+                roughness: 0.6,
+                metalness: 0.1
+            }
+        };
+
+        const theme = themes[themeName] || themes.default;
+
+        // 바닥 재질 업데이트
+        if (this.trayMesh) {
+            this.trayMesh.material.color.setHex(theme.floorColor);
+            this.trayMesh.material.roughness = theme.roughness;
+            this.trayMesh.material.metalness = theme.metalness;
+        }
+
+        // 벽 재질 업데이트
+        if (this.wallMeshes) {
+            this.wallMeshes.forEach(wall => {
+                wall.material.color.setHex(theme.wallColor);
+                wall.material.roughness = theme.roughness;
+                wall.material.metalness = theme.metalness;
+            });
+        }
     }
 
     /**

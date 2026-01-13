@@ -288,6 +288,63 @@ body {
   transform: scale(1.1);
 }
 
+/* Theme Selector */
+.theme-selector {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.theme-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.theme-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.theme-btn.active {
+  background: rgba(233, 69, 96, 0.1);
+  border-color: var(--color-accent);
+}
+
+.theme-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-preview.default {
+  background: #2c3e50;
+  /* Navy */
+}
+
+.theme-preview.wood {
+  background: #8e44ad;
+  /* Temporary color until logic change */
+  background: #5d4037;
+  /* Wood Brown */
+}
+
+.theme-name {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.theme-btn.active .theme-name {
+  color: var(--color-text-primary);
+}
+
 /* Roll Button */
 .roll-btn {
   width: 100%;

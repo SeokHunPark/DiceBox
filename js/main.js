@@ -98,6 +98,35 @@ class DiceBoxApp {
             this.currentSettings = settings;
             this.startRolling();
         });
+
+        // 트레이 테마 선택 버튼 이벤트 연결
+        const themeBtns = document.querySelectorAll('.theme-btn');
+        themeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // UI 업데이트
+                themeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // 테마 적용
+                const theme = btn.dataset.theme;
+                this.setTheme(theme);
+            });
+        });
+    }
+
+    /**
+     * 테마 설정 적용 (렌더러 + 사운드)
+     */
+    setTheme(theme) {
+        console.log(`🎨 Theme changed to: ${theme}`);
+
+        // 1. 렌더러 테마 변경 (시각적)
+        if (this.diceManager && this.diceManager.renderer) {
+            this.diceManager.renderer.setTheme(theme);
+        }
+
+        // 2. 사운드 재질 변경 (청각적)
+        soundManager.setMaterial(theme);
     }
 
     initResultUI() {
