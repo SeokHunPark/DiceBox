@@ -9,6 +9,7 @@ import { StartUI } from './ui/StartUI.js';
 import { ResultUI } from './ui/ResultUI.js';
 import { i18n } from './i18n/i18n.js';
 import { soundManager } from './audio/SoundManager.js';
+import { ShakeDetector } from './input/ShakeDetector.js';
 
 class DiceBoxApp {
     constructor() {
@@ -18,6 +19,9 @@ class DiceBoxApp {
         this.resultUI = null;
         this.rollingIndicator = null;
         this.resultOverlay = null;
+
+        this.shakeDetector = new ShakeDetector();
+        this.isRolling = false;
 
         this.currentSettings = {
             count: 2,
@@ -55,7 +59,23 @@ class DiceBoxApp {
         this.initStartUI();
         this.initResultUI();
 
+        // 흔들기 감지 시작
+        this.initShakeDetection();
+
         console.log('🎲 Dice Box initialized!');
+    }
+
+    /**
+     * 흔들기 감지 초기화
+     */
+    initShakeDetection() {
+        // 실제 센서 감지
+        this.shakeDetector.start(() => {
+            if (!this.isRolling) {
+                console.log('📳 Shake detected! Rolling dice...');
+                this.startRolling();
+            }
+        });
     }
 
     /**
@@ -63,9 +83,13 @@ class DiceBoxApp {
      * 첫 사용자 인터랙션 시 AudioContext 활성화
      */
     initSound() {
-        const activateSound = () => {
+        const activateSound = async () => {
             soundManager.init();
             soundManager.resume();
+
+            // iOS 권한 요청
+            await this.shakeDetector.requestPermission();
+
             // 한 번만 실행
             document.removeEventListener('click', activateSound);
             document.removeEventListener('touchstart', activateSound);
@@ -74,6 +98,37 @@ class DiceBoxApp {
         document.addEventListener('click', activateSound);
         document.addEventListener('touchstart', activateSound);
     }
+
+    // ... (중략: initLanguageSelector, initStartUI 등 기존 코드 유지)
+
+    /**
+     * 주사위 굴리기 시작
+     */
+    async startRolling() {
+        if (this.isRolling) return;
+        this.isRolling = true;
+
+        const { count, color } = this.currentSettings;
+
+        // Roll 버튼 효과음
+        soundManager.playRollButtonSound();
+
+        // Rolling Scene으로 전환
+        this.sceneManager.switchTo('rolling');
+        this.showRollingIndicator(true);
+
+        // 주사위 색상 설정 및 굴리기
+        this.diceManager.setDiceColor(color);
+        const results = await this.diceManager.roll(count);
+
+        // 결과 표시
+        this.showRollingIndicator(false);
+        this.showResults(results);
+
+        this.isRolling = false;
+    }
+
+    // ... (후략: showResults, hideResultOverlay 등 기존 코드 유지)
 
     /**
      * 언어 선택 드롭다운 초기화
@@ -152,6 +207,7 @@ class DiceBoxApp {
         this.resultUI.setOnHome(() => {
             soundManager.playButtonSound();
             this.hideResultOverlay();
+            this.isRolling = false; // 상태 초기화
             this.sceneManager.switchTo('start');
         });
 
