@@ -153,6 +153,9 @@ export class DicePhysics {
             Math.random() * Math.PI * 2
         );
 
+        // 충돌 이벤트 리스너 등록
+        body.addEventListener('collide', (event) => this.handleCollision(event));
+
         this.world.addBody(body);
         this.diceBodies.push(body);
 
@@ -188,6 +191,54 @@ export class DicePhysics {
      */
     step(deltaTime = 1 / 60) {
         this.world.step(deltaTime);
+
+        // 충돌 감지 및 콜백 호출
+        this.checkCollisions();
+    }
+
+    /**
+     * 현재 프레임의 충돌 확인 및 사운드 콜백 호출
+     */
+    checkCollisions() {
+        if (!this.onCollision) return;
+
+        // world.contacts에서 충돌 정보 확인
+        for (const contact of this.world.contacts) {
+            const bodyA = contact.bi;
+            const bodyB = contact.bj;
+
+            // 충돌 속도 계산
+            const relativeVelocity = new CANNON.Vec3();
+            bodyA.velocity.vsub(bodyB.velocity, relativeVelocity);
+            const velocity = relativeVelocity.length();
+
+            // 너무 작은 충돌은 무시
+            if (velocity < 1) continue;
+
+            // 충돌 위치 (X 좌표, 스테레오 패닝용)
+            const x = (bodyA.position.x + bodyB.position.x) / 2;
+
+            // 충돌 유형 판별
+            const isDiceA = this.diceBodies.includes(bodyA);
+            const isDiceB = this.diceBodies.includes(bodyB);
+            const isFloorA = bodyA === this.floorBody;
+            const isFloorB = bodyB === this.floorBody;
+            const isWallA = this.wallBodies.includes(bodyA);
+            const isWallB = this.wallBodies.includes(bodyB);
+
+            let collisionType = null;
+            if (isDiceA && isDiceB) {
+                collisionType = 'dice';
+            } else if ((isDiceA || isDiceB) && (isFloorA || isFloorB)) {
+                collisionType = 'floor';
+            } else if ((isDiceA || isDiceB) && (isWallA || isWallB)) {
+                collisionType = 'wall';
+            }
+
+            if (collisionType) {
+                this.onCollision(collisionType, velocity, x);
+            }
+        }
     }
 
     /**

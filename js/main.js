@@ -43,6 +43,11 @@ class DiceBoxApp {
         const canvas = document.getElementById('dice-canvas');
         this.diceManager = new DiceManager(canvas);
 
+        // 🔊 물리 엔진에 충돌 콜백 직접 연결 (캐싱 우회)
+        this.diceManager.physics.setOnCollision((type, velocity, x) => {
+            soundManager.playCollision(type, velocity, x);
+        });
+
         this.rollingIndicator = document.getElementById('rolling-indicator');
 
         // UI 초기화 및 이벤트 연결
