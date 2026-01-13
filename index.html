@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="description" content="실제 주사위의 손맛을 느낄 수 있는 물리 기반 3D 주사위 시뮬레이터">
   <title>Dice Box - 3D 주사위 시뮬레이터</title>
-  
+
   <!-- Three.js & Cannon-es CDN -->
   <script type="importmap">
     {
@@ -16,29 +17,39 @@
       }
     }
   </script>
-  
+
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
   <!-- Start Scene -->
   <section id="start-scene" class="scene active">
     <div class="scene-content">
+      <!-- 언어 선택 드롭다운 -->
+      <div class="lang-selector-container">
+        <select id="lang-selector" class="lang-selector">
+          <option value="ko">한국어</option>
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+        </select>
+      </div>
+
       <header class="title-area">
-        <h1 class="title">🎲 Dice Box</h1>
-        <p class="subtitle">주사위가 필요한 모든 순간</p>
+        <h1 class="title">🎲 <span data-i18n="title">Dice Box</span></h1>
+        <p class="subtitle" data-i18n="subtitle">주사위가 필요한 모든 순간</p>
       </header>
-      
+
       <div class="settings-card glass">
         <div class="setting-group">
-          <label class="setting-label">주사위 개수</label>
+          <label class="setting-label" data-i18n="diceCount">주사위 개수</label>
           <div class="slider-container">
             <input type="range" id="dice-count" min="1" max="10" value="2" class="slider">
             <span id="dice-count-display" class="slider-value">2</span>
           </div>
         </div>
-        
+
         <div class="setting-group">
-          <label class="setting-label">주사위 색상</label>
+          <label class="setting-label" data-i18n="diceColor">주사위 색상</label>
           <div id="color-palette" class="color-palette">
             <button class="color-btn active" data-color="#e74c3c" style="--btn-color: #e74c3c"></button>
             <button class="color-btn" data-color="#3498db" style="--btn-color: #3498db"></button>
@@ -49,9 +60,9 @@
           </div>
         </div>
       </div>
-      
+
       <button id="roll-btn" class="roll-btn">
-        <span class="roll-btn-text">🎲 Roll!</span>
+        <span class="roll-btn-text" data-i18n="roll">🎲 Roll!</span>
       </button>
     </div>
   </section>
@@ -61,7 +72,7 @@
     <canvas id="dice-canvas"></canvas>
     <div id="rolling-indicator" class="rolling-indicator">
       <div class="spinner"></div>
-      <p>굴리는 중...</p>
+      <p data-i18n="rolling">굴리는 중...</p>
     </div>
   </section>
 
@@ -69,23 +80,23 @@
   <section id="result-scene" class="scene">
     <div class="scene-content">
       <div class="result-card glass">
-        <h2 class="result-title">결과</h2>
-        
+        <h2 class="result-title" data-i18n="result">결과</h2>
+
         <div class="total-container">
-          <span class="total-label">합계</span>
+          <span class="total-label" data-i18n="total">합계</span>
           <span id="total-value" class="total-value">0</span>
         </div>
-        
+
         <div id="dice-groups" class="dice-groups">
           <!-- 눈금별 그룹이 동적으로 추가됨 -->
         </div>
       </div>
-      
+
       <div class="result-actions">
-        <button id="reroll-btn" class="action-btn primary">
+        <button id="reroll-btn" class="action-btn primary" data-i18n="reroll">
           🎲 다시 던지기
         </button>
-        <button id="home-btn" class="action-btn secondary">
+        <button id="home-btn" class="action-btn secondary" data-i18n="home">
           🏠 처음으로
         </button>
       </div>
@@ -94,4 +105,5 @@
 
   <script type="module" src="js/main.js"></script>
 </body>
+
 </html>

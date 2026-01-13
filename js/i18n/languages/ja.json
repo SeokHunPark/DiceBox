@@ -1,0 +1,13 @@
+{
+    "title": "Dice Box",
+    "subtitle": "サイコロが必要なすべての瞬間",
+    "diceCount": "ダイスの数",
+    "diceColor": "ダイスの色",
+    "roll": "🎲 Roll!",
+    "rolling": "転がしています...",
+    "result": "結果",
+    "total": "合計",
+    "reroll": "🎲 もう一度",
+    "home": "🏠 最初へ",
+    "language": "言語"
+}

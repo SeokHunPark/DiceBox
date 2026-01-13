@@ -108,6 +108,47 @@ body {
 }
 
 /* ========================================
+   Language Selector
+   ======================================== */
+
+.lang-selector-container {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  z-index: 100;
+}
+
+.lang-selector {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.875rem;
+  font-family: var(--font-family);
+  color: var(--color-text-primary);
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.lang-selector:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-accent);
+}
+
+.lang-selector:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.3);
+}
+
+.lang-selector option {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+/* ========================================
    Start Scene
    ======================================== */
 

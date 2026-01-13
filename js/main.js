@@ -7,6 +7,7 @@ import { SceneManager } from './scene/SceneManager.js';
 import { DiceManager } from './dice/DiceManager.js';
 import { StartUI } from './ui/StartUI.js';
 import { ResultUI } from './ui/ResultUI.js';
+import { i18n } from './i18n/i18n.js';
 
 class DiceBoxApp {
     constructor() {
@@ -20,11 +21,18 @@ class DiceBoxApp {
             count: 2,
             color: '#e74c3c'
         };
-
-        this.init();
     }
 
-    init() {
+    /**
+     * 앱 초기화 (비동기)
+     */
+    async init() {
+        // i18n 초기화 (언어 로드)
+        await i18n.init();
+
+        // 언어 선택 드롭다운 이벤트 연결
+        this.initLanguageSelector();
+
         // Manager 초기화
         this.sceneManager = new SceneManager();
 
@@ -38,6 +46,22 @@ class DiceBoxApp {
         this.initResultUI();
 
         console.log('🎲 Dice Box initialized!');
+    }
+
+    /**
+     * 언어 선택 드롭다운 초기화
+     */
+    initLanguageSelector() {
+        const langSelector = document.getElementById('lang-selector');
+        if (!langSelector) return;
+
+        // 현재 언어로 드롭다운 설정
+        langSelector.value = i18n.getCurrentLang();
+
+        // 언어 변경 이벤트
+        langSelector.addEventListener('change', async (e) => {
+            await i18n.setLanguage(e.target.value);
+        });
     }
 
     initStartUI() {
@@ -101,6 +125,7 @@ class DiceBoxApp {
 }
 
 // 앱 시작
-window.addEventListener('DOMContentLoaded', () => {
-    new DiceBoxApp();
+window.addEventListener('DOMContentLoaded', async () => {
+    const app = new DiceBoxApp();
+    await app.init();
 });
