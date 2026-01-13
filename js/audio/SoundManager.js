@@ -177,29 +177,46 @@ export class SoundManager {
     }
 
     /**
-     * Roll 버튼 효과음 (밝은 "딩" 소리)
+     * Roll 버튼 효과음 (날카로운 "딸깍" 클릭 소리)
      */
     playRollButtonSound() {
         if (!this.enabled || !this.initialized || !this.audioContext) return;
 
         const ctx = this.audioContext;
         const now = ctx.currentTime;
+        const duration = 0.04;
 
-        // 오실레이터로 깔끔한 톤 생성
-        const osc = ctx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, now); // A5
-        osc.frequency.exponentialRampToValueAtTime(1320, now + 0.05); // E6로 올라감
+        // 노이즈 버퍼 생성
+        const bufferSize = ctx.sampleRate * duration;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
 
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        // 노이즈 소스
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        // 고주파 필터 (딸깍 소리)
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 3000;
+        filter.Q.value = 8;
+
+        // 볼륨 엔벨로프
         const gain = ctx.createGain();
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
-        osc.connect(gain);
+        // 연결 및 재생
+        noise.connect(filter);
+        filter.connect(gain);
         gain.connect(ctx.destination);
 
-        osc.start(now);
-        osc.stop(now + 0.15);
+        noise.start(now);
+        noise.stop(now + duration);
     }
 
     /**
