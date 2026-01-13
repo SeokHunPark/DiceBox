@@ -245,6 +245,61 @@ export class SoundManager {
     }
 
     /**
+     * 토글 버튼 효과음 (기계적인 "찰칵" 스위치 소리)
+     */
+    playToggleSound() {
+        if (!this.enabled || !this.initialized || !this.audioContext) return;
+
+        const ctx = this.audioContext;
+        const now = ctx.currentTime;
+        const duration = 0.05;
+
+        // 1. 노이즈 버스트 (타격감)
+        const bufferSize = ctx.sampleRate * duration;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        // 밴드패스 필터로 중역대 강조 ("척" 하는 소리)
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1500;
+        filter.Q.value = 2;
+
+        const noiseGain = ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.5, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+
+        noise.connect(filter);
+        filter.connect(noiseGain);
+        noiseGain.connect(ctx.destination);
+
+        // 2. 짧은 톤 (금속성)
+        const osc = ctx.createOscillator();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(100, now + 0.03);
+
+        const oscGain = ctx.createGain();
+        oscGain.gain.setValueAtTime(0.1, now);
+        oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+
+        osc.connect(oscGain);
+        oscGain.connect(ctx.destination);
+
+        noise.start(now);
+        noise.stop(now + duration);
+        osc.start(now);
+        osc.stop(now + 0.03);
+    }
+
+    /**
      * 사운드 활성화/비활성화
      */
     setEnabled(enabled) {

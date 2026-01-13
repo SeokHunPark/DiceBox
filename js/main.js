@@ -126,11 +126,11 @@ class DiceBoxApp {
                 if (isCollapsed) {
                     diceGroups.classList.remove('collapsed');
                     toggleBtn.classList.add('expanded');
-                    soundManager.playButtonSound(); // 토글음
+                    soundManager.playToggleSound(); // 찰칵 소리
                 } else {
                     diceGroups.classList.add('collapsed');
                     toggleBtn.classList.remove('expanded');
-                    soundManager.playButtonSound(); // 토글음
+                    soundManager.playToggleSound(); // 찰칵 소리
                 }
             });
         }
