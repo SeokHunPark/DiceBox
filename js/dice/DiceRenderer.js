@@ -44,7 +44,8 @@ export class DiceRenderer {
         this.createTray();
 
         // Resize handler
-        window.addEventListener('resize', () => this.onResize());
+        this.handleResize = this.onResize.bind(this);
+        window.addEventListener('resize', this.handleResize);
     }
 
     /**
@@ -298,7 +299,6 @@ export class DiceRenderer {
         const height = window.innerHeight;
         const aspect = width / height;
 
-        this.camera.aspect = aspect;
         this.adjustCameraForAspect(aspect);
         this.camera.lookAt(0, 0, 0);
         this.camera.updateProjectionMatrix();
@@ -308,6 +308,6 @@ export class DiceRenderer {
     dispose() {
         this.clearDice();
         this.renderer.dispose();
-        window.removeEventListener('resize', this.onResize);
+        window.removeEventListener('resize', this.handleResize);
     }
 }
