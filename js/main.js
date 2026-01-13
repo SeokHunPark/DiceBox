@@ -17,6 +17,7 @@ class DiceBoxApp {
         this.startUI = null;
         this.resultUI = null;
         this.rollingIndicator = null;
+        this.resultOverlay = null;
 
         this.currentSettings = {
             count: 2,
@@ -101,14 +102,17 @@ class DiceBoxApp {
 
     initResultUI() {
         this.resultUI = new ResultUI();
+        this.resultOverlay = document.getElementById('result-overlay');
 
         this.resultUI.setOnReroll(() => {
             soundManager.playRollButtonSound();
+            this.hideResultOverlay();
             this.startRolling();
         });
 
         this.resultUI.setOnHome(() => {
             soundManager.playButtonSound();
+            this.hideResultOverlay();
             this.sceneManager.switchTo('start');
         });
     }
@@ -136,11 +140,18 @@ class DiceBoxApp {
     }
 
     /**
-     * 결과 화면 표시
+     * 결과 오버레이 표시
      */
     showResults(results) {
         this.resultUI.displayResults(results);
-        this.sceneManager.switchTo('result');
+        this.resultOverlay.classList.add('visible');
+    }
+
+    /**
+     * 결과 오버레이 숨김
+     */
+    hideResultOverlay() {
+        this.resultOverlay.classList.remove('visible');
     }
 
     /**

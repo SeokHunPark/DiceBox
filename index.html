@@ -67,18 +67,18 @@
     </div>
   </section>
 
-  <!-- Rolling Scene -->
+  <!-- Rolling Scene (결과 오버레이 포함) -->
   <section id="rolling-scene" class="scene">
     <canvas id="dice-canvas"></canvas>
+
+    <!-- 굴리는 중 인디케이터 -->
     <div id="rolling-indicator" class="rolling-indicator">
       <div class="spinner"></div>
       <p data-i18n="rolling">굴리는 중...</p>
     </div>
-  </section>
 
-  <!-- Result Scene -->
-  <section id="result-scene" class="scene">
-    <div class="scene-content">
+    <!-- 결과 오버레이 (주사위 위에 표시) -->
+    <div id="result-overlay" class="result-overlay">
       <div class="result-card glass">
         <h2 class="result-title" data-i18n="result">결과</h2>
 
@@ -103,7 +103,7 @@
     </div>
   </section>
 
-  <script type="module" src="js/main.js?v=6"></script>
+  <script type="module" src="js/main.js?v=8"></script>
 </body>
 
 </html>

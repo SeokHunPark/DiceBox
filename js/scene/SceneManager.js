@@ -5,15 +5,14 @@ export class SceneManager {
   constructor() {
     this.scenes = {
       start: document.getElementById('start-scene'),
-      rolling: document.getElementById('rolling-scene'),
-      result: document.getElementById('result-scene')
+      rolling: document.getElementById('rolling-scene')
     };
     this.currentScene = 'start';
   }
 
   /**
    * 특정 Scene으로 전환
-   * @param {string} sceneName - 'start' | 'rolling' | 'result'
+   * @param {string} sceneName - 'start' | 'rolling'
    */
   switchTo(sceneName) {
     if (!this.scenes[sceneName]) {
@@ -23,7 +22,7 @@ export class SceneManager {
 
     // 모든 Scene 비활성화
     Object.values(this.scenes).forEach(scene => {
-      scene.classList.remove('active');
+      if (scene) scene.classList.remove('active');
     });
 
     // 대상 Scene 활성화
