@@ -20,11 +20,11 @@ export class DiceRenderer {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x1a1a2e);
 
-        // Camera - OrthographicCamera 사용으로 트레이가 항상 완전히 보임
-        this.traySize = 6; // 트레이 뷰 영역 (약간의 여백 포함)
+        // Camera - PerspectiveCamera 사용 (원근감 적용)
+        this.traySize = 6;
         const aspect = window.innerWidth / window.innerHeight;
-        this.camera = this.createOrthographicCamera(aspect);
-        this.camera.position.set(0, 15, 8);
+        this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
+        this.camera.position.set(0, 18, 12); // 높이와 거리를 적절히 조절
         this.camera.lookAt(0, 0, 0);
 
         // Renderer
@@ -47,47 +47,28 @@ export class DiceRenderer {
         // Resize handler
         this.handleResize = this.onResize.bind(this);
         window.addEventListener('resize', this.handleResize);
+
+        // 초기 카메라 조정
+        this.adjustCameraForAspect(aspect);
     }
 
     /**
-     * OrthographicCamera 생성 - 화면 비율에 맞춰 트레이가 항상 완전히 보이도록 설정
-     */
-    createOrthographicCamera(aspect) {
-        let left, right, top, bottom;
-
-        if (aspect >= 1) {
-            // 가로 화면 (데스크톱) - 높이 기준으로 맞춤
-            left = -this.traySize * aspect;
-            right = this.traySize * aspect;
-            top = this.traySize;
-            bottom = -this.traySize;
-        } else {
-            // 세로 화면 (모바일) - 너비 기준으로 맞춤
-            left = -this.traySize;
-            right = this.traySize;
-            top = this.traySize / aspect;
-            bottom = -this.traySize / aspect;
-        }
-
-        return new THREE.OrthographicCamera(left, right, top, bottom, 0.1, 100);
-    }
-
-    /**
-     * 화면 비율에 따라 카메라 frustum 조정
+     * 화면 비율에 따라 카메라 조정 (Perspective)
      */
     adjustCameraForAspect(aspect) {
-        if (aspect >= 1) {
-            // 가로 화면 (데스크톱)
-            this.camera.left = -this.traySize * aspect;
-            this.camera.right = this.traySize * aspect;
-            this.camera.top = this.traySize;
-            this.camera.bottom = -this.traySize;
+        this.camera.aspect = aspect;
+        this.camera.updateProjectionMatrix();
+
+        // 모바일(세로) 환경에서 트레이가 잘리지 않도록 거리 조정
+        if (aspect < 1) {
+            // 화면이 좁을수록 더 멀리서 찍어야 함 (사용자 테스트 결과 12가 최적)
+            const distance = 12 / aspect;
+            this.camera.position.set(0, distance, (distance * 0.5) + 5);
+            this.camera.lookAt(0, 0, 0);
         } else {
-            // 세로 화면 (모바일)
-            this.camera.left = -this.traySize;
-            this.camera.right = this.traySize;
-            this.camera.top = this.traySize / aspect;
-            this.camera.bottom = -this.traySize / aspect;
+            // 데스크톱(가로)
+            this.camera.position.set(0, 18, 12);
+            this.camera.lookAt(0, 0, 0);
         }
     }
 

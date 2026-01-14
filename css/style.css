@@ -80,6 +80,8 @@ body {
   opacity: 0;
   visibility: hidden;
   transition: opacity var(--transition-slow), visibility var(--transition-slow);
+  overflow-y: auto;
+  /* 스크롤 허용 */
 }
 
 .scene.active {
@@ -90,11 +92,15 @@ body {
 .scene-content {
   width: 100%;
   max-width: 400px;
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm);
+  padding-top: var(--spacing-lg);
+  /* 상단 버튼 공간 확보 (축소) */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-sm);
+  margin: auto;
+  /* 스크롤 시 중앙 정렬 유지 */
 }
 
 /* ========================================
@@ -116,22 +122,21 @@ body {
 
 .lang-selector-container {
   position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
   z-index: 100;
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm) !important;
-  /* 인라인 스타일 오버라이드 */
+  gap: var(--spacing-xs) !important;
 }
 
 .icon-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1rem;
   background: var(--glass-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -155,7 +160,7 @@ body {
 }
 
 .lang-selector {
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: 0 var(--spacing-sm);
   font-size: 0.875rem;
   font-family: var(--font-family);
   color: var(--color-text-primary);
@@ -166,7 +171,7 @@ body {
   border-radius: var(--radius-sm);
   cursor: pointer;
   outline: none;
-  height: 36px;
+  height: 32px;
   /* 높이 맞춤 */
   transition: all var(--transition-fast);
 }
@@ -192,11 +197,11 @@ body {
 
 .title-area {
   text-align: center;
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
 }
 
 .title {
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: 700;
   background: linear-gradient(135deg, #fff 0%, var(--color-accent) 100%);
   -webkit-background-clip: text;
@@ -294,8 +299,8 @@ body {
 }
 
 .dice-type-btn {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  min-width: 48px;
+  padding: var(--spacing-xs);
+  min-width: 40px;
   font-size: 0.875rem;
   font-weight: 700;
   font-family: var(--font-family);
@@ -327,8 +332,8 @@ body {
 }
 
 .color-btn {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border: 3px solid transparent;
   border-radius: var(--radius-full);
   background: var(--btn-color);
@@ -416,8 +421,8 @@ body {
 /* Roll Button */
 .roll-btn {
   width: 100%;
-  padding: var(--spacing-md) var(--spacing-lg);
-  font-size: 1.5rem;
+  padding: var(--spacing-sm);
+  font-size: 1.25rem;
   font-weight: 700;
   color: white;
   background: linear-gradient(135deg, var(--color-accent) 0%, #c0392b 100%);
