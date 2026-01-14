@@ -11,5 +11,41 @@
     "reroll": "🎲 Roll Again",
     "home": "🏠 Home",
     "share": "🔗 Share",
-    "language": "Language"
+    "language": "Language",
+    "content": {
+        "intro": {
+            "title": "🎲 What is Dice Box?",
+            "desc": "Dice Box is a <strong>3D dice simulator</strong> that runs directly on the web without installation. Roll dice anytime, anywhere for TRPG sessions, board games, or simple bets. It uses a powerful 3D physics engine to provide realistic randomness like real dice."
+        },
+        "features": {
+            "title": "✨ Key Features",
+            "list1": "<strong>Various Dice</strong>: D4, D6, D8, D12, D20 supported for TRPG needs",
+            "list2": "<strong>Realistic Physics</strong>: Simulation based on physics collisions, not just random numbers",
+            "list3": "<strong>Customization</strong>: Change dice colors and tray themes (Felt, Wood, etc.)",
+            "list4": "<strong>Share Results</strong>: Capture dice roll results as images to share with friends",
+            "list5": "<strong>Mobile Optimized</strong>: Mobile-friendly interface including shake-to-roll feature"
+        },
+        "guide": {
+            "title": "📚 Dice Guide",
+            "d20": {
+                "title": "D20 (Icosahedron)",
+                "desc": "The most important die in d20 systems like D&D. Used for attack rolls, ability checks, and saving throws. Experience the thrill of a Critical Miss (1) or a Critical Hit (20)!"
+            },
+            "d6": {
+                "title": "D6 (Cube)",
+                "desc": "The most common and familiar die. Widely used for character ability generation, weapon damage (Shortsword), or spell damage (Fireball)."
+            },
+            "d8": {
+                "title": "D8 (Octahedron)",
+                "desc": "Mainly used for weapon damage like Longsword or Warhammer, or Cleric's weapon damage."
+            }
+        },
+        "footer": {
+            "privacy": "Privacy Policy",
+            "terms": "Terms of Service",
+            "inquiry": "Contact Us",
+            "copyright": "© 2026 Dice Box. All rights reserved.",
+            "disclaimer": "Dice Box is a fan-made project and is not an official tool of any specific TRPG system."
+        }
+    }
 }

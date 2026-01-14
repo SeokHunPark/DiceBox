@@ -11,5 +11,41 @@
     "reroll": "🎲 다시 던지기",
     "home": "🏠 처음으로",
     "share": "🔗 공유하기",
-    "language": "언어"
+    "language": "언어",
+    "content": {
+        "intro": {
+            "title": "🎲 Dice Box란?",
+            "desc": "Dice Box는 설치 없이 웹에서 바로 사용할 수 있는 <strong>3D 주사위 시뮬레이터</strong>입니다. TRPG 세션, 보드게임, 혹은 간단한 내기가 필요할 때 언제 어디서나 주사위를 굴려보세요. 강력한 3D 물리 엔진을 사용하여 실제 주사위와 같은 무작위성을 제공합니다."
+        },
+        "features": {
+            "title": "✨ 주요 기능",
+            "list1": "<strong>다양한 주사위</strong>: D4, D6, D8, D12, D20 등 TRPG에 필요한 모든 주사위 지원",
+            "list2": "<strong>리얼한 물리 엔진</strong>: 단순 난수 생성이 아닌, 물리 충돌 기반의 리얼한 시뮬레이션",
+            "list3": "<strong>커스터마이징</strong>: 주사위 색상, 트레이 테마(펠트, 나무 등) 변경 가능",
+            "list4": "<strong>결과 공유</strong>: 주사위 굴림 결과를 이미지로 캡처하여 친구들과 공유",
+            "list5": "<strong>모바일 최적화</strong>: 스마트폰 흔들기 기능을 포함한 모바일 친화적 인터페이스"
+        },
+        "guide": {
+            "title": "📚 주사위 가이드",
+            "d20": {
+                "title": "D20 (정이십면체)",
+                "desc": "D&D(Dungeons & Dragons)와 같은 d20 시스템에서 가장 중요하게 사용되는 주사위입니다. 공격 굴림, 능력 판정, 내성 굴림 등 게임의 핵심적인 판정에 사용됩니다. 1이 나오면 대실패(Critical Miss), 20이 나오면 대성공(Critical Hit)의 짜릿함을 느껴보세요!"
+            },
+            "d6": {
+                "title": "D6 (정육면체)",
+                "desc": "가장 일반적이고 친숙한 주사위입니다. 캐릭터의 능력치 생성, 짧은 검(Shortsword)이나 화염구(Fireball) 주문의 피해량 결정 등에 널리 쓰입니다."
+            },
+            "d8": {
+                "title": "D8 (정팔면체)",
+                "desc": "전투 성직자(Cleric)의 무기나 롱소드(Longsword), 워해머(Warhammer)의 피해량을 결정할 때 주로 사용됩니다."
+            }
+        },
+        "footer": {
+            "privacy": "개인정보처리방침",
+            "terms": "이용약관",
+            "inquiry": "문의하기",
+            "copyright": "© 2026 Dice Box. All rights reserved.",
+            "disclaimer": "Dice Box는 팬 메이드 프로젝트이며, 특정 TRPG 시스템의 공식 툴이 아닙니다."
+        }
+    }
 }

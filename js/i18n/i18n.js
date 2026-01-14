@@ -79,8 +79,24 @@ export class I18n {
      * @param {string} key - 번역 키
      * @returns {string} 번역된 텍스트
      */
+    /**
+     * 번역 텍스트 가져오기 (중첩 키 지원)
+     * @param {string} key - 번역 키 (예: 'section.title')
+     * @returns {string} 번역된 텍스트
+     */
     t(key) {
-        return this.translations[key] || key;
+        const keys = key.split('.');
+        let value = this.translations;
+
+        for (const k of keys) {
+            if (value && value[k]) {
+                value = value[k];
+            } else {
+                return key; // 키를 찾지 못하면 키 자체 반환
+            }
+        }
+
+        return value;
     }
 
     /**
@@ -89,7 +105,7 @@ export class I18n {
     applyTranslations() {
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.dataset.i18n;
-            el.textContent = this.t(key);
+            el.innerHTML = this.t(key); // HTML 태그 지원을 위해 innerHTML 사용
         });
 
         // placeholder 번역
