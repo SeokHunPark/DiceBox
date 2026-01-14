@@ -107,6 +107,7 @@ export class DiceManager {
      * 굴리기 중지 및 결과 반환
      */
     stopRolling() {
+        if (!this.isRolling) return; // 이미 중지된 경우 무시
         this.isRolling = false;
 
         if (this.animationId) {
@@ -118,10 +119,12 @@ export class DiceManager {
         const results = this.physics.getAllResults();
 
         if (this.onRollComplete) {
+            const callback = this.onRollComplete;
+            this.onRollComplete = null; // 중복 호출 방지
+
             // 약간의 딜레이 후 결과 반환 (시각적 안정화)
             setTimeout(() => {
-                this.onRollComplete(results);
-                this.onRollComplete = null;
+                callback(results);
             }, 500);
         }
     }

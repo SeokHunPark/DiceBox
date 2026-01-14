@@ -9,7 +9,7 @@ import { StartUI } from './ui/StartUI.js';
 import { ResultUI } from './ui/ResultUI.js';
 import { i18n } from './i18n/i18n.js';
 import { soundManager } from './audio/SoundManager.js';
-import { ShakeDetector } from './input/ShakeDetector.js';
+
 import { ShareManager } from './utils/ShareManager.js';
 
 class DiceBoxApp {
@@ -21,7 +21,6 @@ class DiceBoxApp {
         this.rollingIndicator = null;
         this.resultOverlay = null;
 
-        this.shakeDetector = new ShakeDetector();
         this.shareManager = null; // ShareManager 추가
         this.isRolling = false;
 
@@ -36,39 +35,42 @@ class DiceBoxApp {
      * 앱 초기화 (비동기)
      */
     async init() {
-        // i18n 초기화 (언어 로드)
-        await i18n.init();
+        try {
+            // i18n 초기화 (언어 로드)
+            await i18n.init();
 
-        // 언어 선택 드롭다운 이벤트 연결
-        this.initLanguageSelector();
+            // 언어 선택 드롭다운 이벤트 연결
+            this.initLanguageSelector();
 
-        // 사운드 매니저 초기화 (사용자 인터랙션 전 준비)
-        this.initSound();
+            // 사운드 매니저 초기화 (사용자 인터랙션 전 준비)
+            this.initSound();
 
-        // Manager 초기화
-        this.sceneManager = new SceneManager();
+            // Manager 초기화
+            this.sceneManager = new SceneManager();
 
-        const canvas = document.getElementById('dice-canvas');
-        this.diceManager = new DiceManager(canvas);
+            const canvas = document.getElementById('dice-canvas');
+            if (!canvas) throw new Error('Canvas element not found');
+            this.diceManager = new DiceManager(canvas);
 
-        // ShareManager 초기화
-        this.shareManager = new ShareManager();
+            // ShareManager 초기화
+            this.shareManager = new ShareManager();
 
-        // 🔊 물리 엔진에 충돌 콜백 직접 연결 (캐싱 우회)
-        this.diceManager.physics.setOnCollision((type, velocity, x) => {
-            soundManager.playCollision(type, velocity, x);
-        });
+            // 🔊 물리 엔진에 충돌 콜백 직접 연결 (캐싱 우회)
+            this.diceManager.physics.setOnCollision((type, velocity, x) => {
+                soundManager.playCollision(type, velocity, x);
+            });
 
-        this.rollingIndicator = document.getElementById('rolling-indicator');
+            this.rollingIndicator = document.getElementById('rolling-indicator');
 
-        // UI 초기화 및 이벤트 연결
-        this.initStartUI();
-        this.initResultUI();
+            // UI 초기화 및 이벤트 연결
+            this.initStartUI();
+            this.initResultUI();
 
-        // 흔들기 감지 시작 (현재 비활성화 요청으로 주석 처리)
-        // this.initShakeDetection();
-
-        console.log('🎲 Dice Box initialized!');
+            console.log('🎲 Dice Box initialized!');
+        } catch (error) {
+            console.error('Failed to initialize Dice Box:', error);
+            alert('초기화 중 오류가 발생했습니다. 페이지를 새로고침 해주세요.');
+        }
     }
 
     // ... (중략)
@@ -123,18 +125,7 @@ class DiceBoxApp {
         }
     }
 
-    /**
-     * 흔들기 감지 초기화
-     */
-    initShakeDetection() {
-        // 실제 센서 감지
-        this.shakeDetector.start(() => {
-            if (!this.isRolling) {
-                console.log('📳 Shake detected! Rolling dice...');
-                this.startRolling();
-            }
-        });
-    }
+
 
     /**
      * 사운드 매니저 초기화
@@ -145,8 +136,7 @@ class DiceBoxApp {
             soundManager.init();
             soundManager.resume();
 
-            // iOS 권한 요청
-            await this.shakeDetector.requestPermission();
+
 
             // 한 번만 실행
             document.removeEventListener('click', activateSound);

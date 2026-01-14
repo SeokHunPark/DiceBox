@@ -42,18 +42,36 @@ export class I18n {
 
     /**
      * 언어 파일 로드
+     * 기본 언어(en)를 먼저 로드하고, 선택된 언어로 덮어쓰는 방식으로 폴백 구현
      * @param {string} lang - 언어 코드
      */
     async loadLanguage(lang) {
         try {
-            const response = await fetch(`./js/i18n/languages/${lang}.json`);
-            this.translations = await response.json();
-        } catch (error) {
-            console.error(`Failed to load language: ${lang}`, error);
-            // 폴백: 영어 로드 시도
-            if (lang !== 'en') {
-                await this.loadLanguage('en');
+            // 1. 기본 언어(en) 로드
+            const defaultResponse = await fetch(`./js/i18n/languages/en.json`);
+            const defaultTranslations = await defaultResponse.json();
+
+            // 2. 대상 언어가 en이면 바로 적용
+            if (lang === 'en') {
+                this.translations = defaultTranslations;
+                return;
             }
+
+            // 3. 대상 언어 로드
+            try {
+                const response = await fetch(`./js/i18n/languages/${lang}.json`);
+                const targetTranslations = await response.json();
+
+                // 4. 병합 (Deep Merge)
+                this.translations = this.deepMerge(defaultTranslations, targetTranslations);
+            } catch (error) {
+                console.warn(`Failed to load language: ${lang}, falling back to English`, error);
+                this.translations = defaultTranslations;
+            }
+
+        } catch (error) {
+            console.error('CRITICAL: Failed to load default language (en)', error);
+            this.translations = {}; // 빈 객체로 초기화하여 크래시 방지
         }
     }
 
@@ -75,10 +93,29 @@ export class I18n {
     }
 
     /**
-     * 번역 텍스트 가져오기
-     * @param {string} key - 번역 키
-     * @returns {string} 번역된 텍스트
+     * 객체 깊은 병합 (Deep Merge)
+     * @param {Object} target 
+     * @param {Object} source 
+     * @returns {Object}
      */
+    deepMerge(target, source) {
+        const output = { ...target };
+        if (isObject(target) && isObject(source)) {
+            Object.keys(source).forEach(key => {
+                if (isObject(source[key])) {
+                    if (!(key in target)) {
+                        Object.assign(output, { [key]: source[key] });
+                    } else {
+                        output[key] = this.deepMerge(target[key], source[key]);
+                    }
+                } else {
+                    Object.assign(output, { [key]: source[key] });
+                }
+            });
+        }
+        return output;
+    }
+
     /**
      * 번역 텍스트 가져오기 (중첩 키 지원)
      * @param {string} key - 번역 키 (예: 'section.title')
@@ -89,7 +126,7 @@ export class I18n {
         let value = this.translations;
 
         for (const k of keys) {
-            if (value && value[k]) {
+            if (value && value[k] !== undefined) {
                 value = value[k];
             } else {
                 return key; // 키를 찾지 못하면 키 자체 반환
@@ -140,3 +177,10 @@ export class I18n {
 
 // 싱글톤 인스턴스
 export const i18n = new I18n();
+
+/**
+ * 객체 확인 헬퍼 함수
+ */
+function isObject(item) {
+    return (item && typeof item === 'object' && !Array.isArray(item));
+}
