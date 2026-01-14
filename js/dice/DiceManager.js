@@ -14,6 +14,7 @@ export class DiceManager {
         this.animationId = null;
         this.onRollComplete = null;
         this.diceColor = '#e74c3c';
+        this.diceType = 'd6'; // 주사위 타입 (d4, d6, d8, d12, d20)
 
         // 물리 충돌 → 사운드 재생 연결
         this.physics.setOnCollision((type, velocity, x) => {
@@ -29,6 +30,13 @@ export class DiceManager {
     }
 
     /**
+     * 주사위 타입 설정
+     */
+    setDiceType(type) {
+        this.diceType = type;
+    }
+
+    /**
      * 주사위 던지기 시작
      * @param {number} count - 주사위 개수
      * @returns {Promise<number[]>} 결과 배열
@@ -41,10 +49,10 @@ export class DiceManager {
             this.rollStartTime = Date.now();
             this.maxRollTime = 10000; // 10초 타임아웃
 
-            // 주사위 생성
+            // 주사위 생성 (타입 전달)
             for (let i = 0; i < count; i++) {
-                const mesh = this.renderer.createDiceMesh(this.diceColor);
-                const body = this.physics.createDiceBody();
+                const mesh = this.renderer.createDiceMesh(this.diceType, this.diceColor);
+                const body = this.physics.createDiceBody(this.diceType);
 
                 // 초기 위치 동기화
                 mesh.position.copy(body.position);
@@ -53,7 +61,7 @@ export class DiceManager {
                 // 던지기 힘 적용
                 this.physics.throwDice(body);
 
-                this.diceData.push({ mesh, body });
+                this.diceData.push({ mesh, body, type: this.diceType });
             }
 
             // 애니메이션 루프 시작

@@ -27,7 +27,8 @@ class DiceBoxApp {
 
         this.currentSettings = {
             count: 2,
-            color: '#e74c3c'
+            color: '#e74c3c',
+            type: 'd6'
         };
     }
 
@@ -165,14 +166,15 @@ class DiceBoxApp {
         if (this.isRolling) return;
         this.isRolling = true;
 
-        const { count, color } = this.currentSettings;
+        const { count, color, type } = this.currentSettings;
 
         // Rolling Scene으로 전환
         this.sceneManager.switchTo('rolling');
         this.showRollingIndicator(true);
 
-        // 주사위 색상 설정 및 굴리기
+        // 주사위 색상 및 타입 설정 후 굴리기
         this.diceManager.setDiceColor(color);
+        this.diceManager.setDiceType(type);
         const results = await this.diceManager.roll(count);
 
         // 결과 표시

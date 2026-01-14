@@ -196,25 +196,94 @@ export class DiceRenderer {
     }
 
     /**
-     * D6 주사위 메시 생성
+     * 주사위 메시 생성 (타입별)
+     * @param {string} type - 주사위 타입 (d4, d6, d8, d12, d20)
      * @param {string} color - 주사위 색상 (hex)
      * @returns {THREE.Mesh}
      */
-    createDiceMesh(color = '#e74c3c') {
-        const size = 1;
-        const geometry = new THREE.BoxGeometry(size, size, size);
-
-        // 각 면에 다른 텍스처 적용을 위한 머티리얼 배열
-        const materials = this.createDiceMaterials(color);
+    createDiceMesh(type = 'd6', color = '#e74c3c') {
+        const geometry = this.createDiceGeometry(type);
+        const materials = this.createDiceMaterials(type, color);
 
         const mesh = new THREE.Mesh(geometry, materials);
         mesh.castShadow = true;
         mesh.receiveShadow = true;
+        mesh.userData.diceType = type; // 타입 저장
 
         this.diceMeshes.push(mesh);
         this.scene.add(mesh);
 
         return mesh;
+    }
+
+    /**
+     * 타입별 지오메트리 생성
+     */
+    createDiceGeometry(type) {
+        const size = 1;
+        let geometry;
+
+        switch (type) {
+            case 'd4':
+                geometry = new THREE.TetrahedronGeometry(size * 0.8);
+                break;
+            case 'd8':
+                geometry = new THREE.OctahedronGeometry(size * 0.7);
+                geometry = this.fixGeometryGroups(geometry, 8); // 8개 면
+                break;
+            case 'd12':
+                geometry = new THREE.DodecahedronGeometry(size * 0.6);
+                break;
+            case 'd20':
+                geometry = new THREE.IcosahedronGeometry(size * 0.7);
+                geometry = this.fixGeometryGroups(geometry, 20); // 20개 면
+                break;
+            case 'd6':
+            default:
+                geometry = new THREE.BoxGeometry(size, size, size);
+                break;
+        }
+
+        return geometry;
+    }
+
+    /**
+     * 다면체 지오메트리에 머티리얼 인덱스 그룹 할당 및 UV 수정
+     */
+    fixGeometryGroups(geometry, faceCount) {
+        const nonIndexed = geometry.toNonIndexed();
+
+        const positionAttribute = nonIndexed.attributes.position;
+        const uvAttribute = nonIndexed.attributes.uv;
+        const vertexCount = positionAttribute.count;
+        const verticesPerFace = vertexCount / faceCount;
+
+        nonIndexed.clearGroups();
+
+        // 텍스처 매핑을 위한 UV 좌표 (삼각형 중앙에 숫자가 오도록)
+        // 텍스처 중심(0.5, 0.5)을 기준으로 삼각형 UV 배치
+        // 상단(0.5, 0.9), 좌하단(0.15, 0.2), 우하단(0.85, 0.2)
+        const uvs = [
+            new THREE.Vector2(0.5, 0.9),  // 상단
+            new THREE.Vector2(0.15, 0.2), // 좌하단
+            new THREE.Vector2(0.85, 0.2)  // 우하단
+        ];
+
+        for (let i = 0; i < faceCount; i++) {
+            nonIndexed.addGroup(i * verticesPerFace, verticesPerFace, i);
+
+            // 각 면의 버텍스마다 UV 할당
+            for (let j = 0; j < verticesPerFace; j++) {
+                // 단순화된 매핑: 정점 순서대로 할당 ( j % 3 )
+                const uv = uvs[j % 3];
+                // uvAttribute가 없을 경우 생성해야 할 수도 있으나 toNonIndexed는 보통 UV를 포함함
+                if (uvAttribute) {
+                    uvAttribute.setXY(i * verticesPerFace + j, uv.x, uv.y);
+                }
+            }
+        }
+
+        return nonIndexed;
     }
 
     /**
@@ -231,9 +300,25 @@ export class DiceRenderer {
     }
 
     /**
-     * D6 각 면의 머티리얼 생성 (눈금 표시)
+     * 타입별 머티리얼 생성
      */
-    createDiceMaterials(baseColor) {
+    createDiceMaterials(type, baseColor) {
+        switch (type) {
+            case 'd6':
+                return this.createD6Materials(baseColor);
+            case 'd8':
+                return this.createD8Materials(baseColor);
+            case 'd20':
+                return this.createD20Materials(baseColor);
+            default:
+                return this.createPolyMaterial(baseColor);
+        }
+    }
+
+    /**
+     * D6용 머티리얼 (각 면별 눈금)
+     */
+    createD6Materials(baseColor) {
         const faceValues = [2, 5, 3, 4, 1, 6]; // Three.js face order: +X, -X, +Y, -Y, +Z, -Z
         const dotColor = this.isLightColor(baseColor) ? '#222222' : '#ffffff';
 
@@ -252,7 +337,7 @@ export class DiceRenderer {
             ctx.lineWidth = 4;
             ctx.strokeRect(4, 4, 120, 120);
 
-            // 눈금 그리기 (밝은 색상은 검은 눈금)
+            // 눈금 그리기
             ctx.fillStyle = dotColor;
             this.drawDiceDots(ctx, value, 128);
 
@@ -264,6 +349,84 @@ export class DiceRenderer {
                 roughness: 0.4,
                 metalness: 0.1
             });
+        });
+    }
+
+    /**
+     * D8용 머티리얼 (각 면별 숫자)
+     */
+    createD8Materials(baseColor) {
+        const textColor = this.isLightColor(baseColor) ? '#222222' : '#ffffff';
+
+        // D8: 8개 면에 1-8 숫자
+        const materials = [];
+        for (let i = 1; i <= 8; i++) {
+            materials.push(this.createNumberMaterial(baseColor, textColor, i));
+        }
+        return materials;
+    }
+
+    /**
+     * D20용 머티리얼 (표준 D20 면 배치)
+     */
+    createD20Materials(baseColor) {
+        const textColor = this.isLightColor(baseColor) ? '#222222' : '#ffffff';
+
+        // 표준 D20 면 값 (근사치)
+        const faceValues = [
+            1, 20, 2, 19, 3, 18, 4, 17, 5, 16,
+            6, 15, 7, 14, 8, 13, 9, 12, 10, 11
+        ];
+
+        return faceValues.map(value => this.createNumberMaterial(baseColor, textColor, value));
+    }
+
+    /**
+     * 숫자가 있는 머티리얼 생성
+     */
+    createNumberMaterial(baseColor, textColor, number) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 128;
+        canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+
+        // 배경색 (전체 채우기)
+        ctx.fillStyle = baseColor;
+        ctx.fillRect(0, 0, 128, 128);
+
+        // 테두리 (선택 사항)
+        ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(2, 2, 124, 124);
+
+        // 숫자
+        ctx.fillStyle = textColor;
+        ctx.font = 'bold 40px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(number.toString(), 64, 64);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.center.set(0.5, 0.5); // 텍스처 중심점 설정
+        texture.anisotropy = 4;
+
+        return new THREE.MeshStandardMaterial({
+            map: texture,
+            roughness: 0.3,
+            metalness: 0.1,
+            flatShading: true
+        });
+    }
+
+    /**
+     * 다면체용 단일 머티리얼 (숫자 없이 깔끔하게)
+     */
+    createPolyMaterial(baseColor) {
+        return new THREE.MeshStandardMaterial({
+            color: baseColor,
+            roughness: 0.3,
+            metalness: 0.2,
+            flatShading: true
         });
     }
 

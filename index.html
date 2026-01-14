@@ -44,6 +44,15 @@
 
       <div class="settings-card glass">
         <div class="setting-group">
+          <label class="setting-label" data-i18n="diceType">주사위 종류</label>
+          <div id="dice-type-selector" class="dice-type-selector">
+            <button class="dice-type-btn active" data-type="d6">D6</button>
+            <button class="dice-type-btn" data-type="d8">D8</button>
+            <button class="dice-type-btn" data-type="d20">D20</button>
+          </div>
+        </div>
+
+        <div class="setting-group">
           <label class="setting-label" data-i18n="diceCount">주사위 개수</label>
           <div class="slider-container">
             <input type="range" id="dice-count" min="1" max="10" value="2" class="slider">

@@ -286,6 +286,39 @@ body {
   color: var(--color-accent);
 }
 
+/* Dice Type Selector */
+.dice-type-selector {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.dice-type-btn {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  min-width: 48px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-family: var(--font-family);
+  color: var(--color-text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.dice-type-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary);
+}
+
+.dice-type-btn.active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: white;
+  transform: scale(1.05);
+}
+
 /* Color Palette */
 .color-palette {
   display: flex;

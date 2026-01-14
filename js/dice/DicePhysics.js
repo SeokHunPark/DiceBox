@@ -126,11 +126,11 @@ export class DicePhysics {
 
     /**
      * 주사위 물리 바디 생성
+     * @param {string} type - 주사위 타입 (d4, d6, d8, d12, d20)
      * @returns {CANNON.Body}
      */
-    createDiceBody() {
-        const size = 0.5; // 반지름 (Three.js의 1 사이즈와 매칭)
-        const shape = new CANNON.Box(new CANNON.Vec3(size, size, size));
+    createDiceBody(type = 'd6') {
+        const shape = this.createDiceShape(type);
 
         const body = new CANNON.Body({
             mass: 1,
@@ -138,6 +138,9 @@ export class DicePhysics {
             sleepSpeedLimit: 0.1,
             sleepTimeLimit: 1
         });
+
+        // 타입 저장 (결과 판정용)
+        body.diceType = type;
 
         // 랜덤 초기 위치 (트레이 위 공중)
         body.position.set(
@@ -160,6 +163,104 @@ export class DicePhysics {
         this.diceBodies.push(body);
 
         return body;
+    }
+
+    /**
+     * 타입별 충돌 모양 생성
+     */
+    createDiceShape(type) {
+        const scale = 0.5;
+        switch (type) {
+            case 'd4':
+                return this.createTetrahedronShape(scale);
+            case 'd8':
+                return this.createOctahedronShape(scale);
+            case 'd12':
+                // D12: 정팔면체를 약간 크게 사용 (정십이면체 ConvexPolyhedron 불안정)
+                return this.createOctahedronShape(scale * 0.9);
+            case 'd20':
+                return this.createIcosahedronShape(scale);
+            case 'd6':
+            default:
+                return new CANNON.Box(new CANNON.Vec3(scale, scale, scale));
+        }
+    }
+
+    /**
+     * 정사면체 (D4) 충돌체 생성 - 올바른 면 순서
+     */
+    createTetrahedronShape(scale) {
+        const a = scale * 1.2;
+        // 정사면체 정점 (정규화된 좌표)
+        const vertices = [
+            new CANNON.Vec3(a, a, a),      // 0
+            new CANNON.Vec3(a, -a, -a),    // 1
+            new CANNON.Vec3(-a, a, -a),    // 2
+            new CANNON.Vec3(-a, -a, a)     // 3
+        ];
+        // 면 정의: 반시계 방향 (외부에서 볼 때)
+        const faces = [
+            [0, 2, 1],  // 위쪽 면
+            [0, 1, 3],  // 오른쪽 면
+            [0, 3, 2],  // 왼쪽 면
+            [1, 2, 3]   // 바닥 면
+        ];
+        return new CANNON.ConvexPolyhedron({ vertices, faces });
+    }
+
+    /**
+     * 정팔면체 (D8) 충돌체 생성 - Three.js OctahedronGeometry와 일치
+     */
+    createOctahedronShape(scale) {
+        const s = scale * 1.2;
+        // Three.js OctahedronGeometry vertices
+        const vertices = [
+            new CANNON.Vec3(s, 0, 0),    // 0
+            new CANNON.Vec3(-s, 0, 0),   // 1
+            new CANNON.Vec3(0, s, 0),    // 2
+            new CANNON.Vec3(0, -s, 0),   // 3
+            new CANNON.Vec3(0, 0, s),    // 4
+            new CANNON.Vec3(0, 0, -s)    // 5
+        ];
+        // Three.js indices
+        const faces = [
+            [0, 2, 4], [0, 4, 3], [0, 3, 5], [0, 5, 2],
+            [1, 2, 5], [1, 5, 3], [1, 3, 4], [1, 4, 2]
+        ];
+        return new CANNON.ConvexPolyhedron({ vertices, faces });
+    }
+
+    /**
+     * 정십이면체 (D12) 충돌체 생성
+     */
+    createDodecahedronShape(scale) {
+        // D12: 정팔면체를 약간 크게 사용 (정십이면체 ConvexPolyhedron 불안정)
+        return this.createOctahedronShape(scale * 0.9);
+    }
+
+    /**
+     * 정이십면체 (D20) 충돌체 생성 - Three.js IcosahedronGeometry와 일치
+     */
+    createIcosahedronShape(scale) {
+        const t = (1 + Math.sqrt(5)) / 2;
+        const s = scale * 0.8;
+
+        // Three.js IcosahedronGeometry vertices (scaled)
+        const vertices = [
+            new CANNON.Vec3(-s, s * t, 0), new CANNON.Vec3(s, s * t, 0), new CANNON.Vec3(-s, -s * t, 0), new CANNON.Vec3(s, -s * t, 0),
+            new CANNON.Vec3(0, -s, s * t), new CANNON.Vec3(0, s, s * t), new CANNON.Vec3(0, -s, -s * t), new CANNON.Vec3(0, s, -s * t),
+            new CANNON.Vec3(s * t, 0, -s), new CANNON.Vec3(s * t, 0, s), new CANNON.Vec3(-s * t, 0, -s), new CANNON.Vec3(-s * t, 0, s)
+        ];
+
+        // Three.js indices
+        const faces = [
+            [0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11],
+            [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8],
+            [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9],
+            [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1]
+        ];
+
+        return new CANNON.ConvexPolyhedron({ vertices, faces });
     }
 
     /**
@@ -281,15 +382,119 @@ export class DicePhysics {
     allDiceStopped() {
         // 범위 밖 주사위가 있으면 리셋
         this.resetOutOfBoundsDice();
-        return this.diceBodies.every(body => body.sleepState === CANNON.Body.SLEEPING);
+
+        // 모든 주사위가 정지 상태인지 확인 (sleep 또는 속도 기반)
+        return this.diceBodies.every(body => {
+            // 이미 sleep 상태면 정지로 판단
+            if (body.sleepState === CANNON.Body.SLEEPING) {
+                return true;
+            }
+
+            // 속도가 매우 낮으면 정지로 판단 (ConvexPolyhedron이 sleep에 잘 안 들어갈 수 있음)
+            const velocity = body.velocity.length();
+            const angularVelocity = body.angularVelocity.length();
+
+            if (velocity < 0.1 && angularVelocity < 0.1) {
+                // 강제로 sleep 상태로 설정
+                body.sleep();
+                return true;
+            }
+
+            return false;
+        });
     }
 
     /**
-     * 주사위의 윗면 눈금 계산 (법선 벡터 기반)
+     * 주사위의 결과값 계산
      * @param {CANNON.Body} body
-     * @returns {number} 1-6 눈금
+     * @returns {number} 주사위 눈금
+     */
+    /**
+     * 주사위의 결과값 계산
+     * @param {CANNON.Body} body
+     * @returns {number} 주사위 눈금
      */
     getDiceValue(body) {
+        const type = body.diceType || 'd6';
+
+        // D6는 기존 로직 (Box 충돌체는 법선이 축 정렬됨)
+        if (type === 'd6') {
+            return this.getD6Value(body);
+        }
+
+        // D8, D20 등 다면체는 ConvexPolyhedron의 법선을 이용해 판정
+        if (body.shapes[0] && body.shapes[0] instanceof CANNON.ConvexPolyhedron) {
+            return this.getPolyhedronValue(body, type);
+        }
+
+        // 예외 처리 (랜덤)
+        return this.getRandomDiceValue(type);
+    }
+
+    /**
+     * 다면체 주사위 눈금 계산
+     */
+    getPolyhedronValue(body, type) {
+        const shape = body.shapes[0];
+        const faces = shape.faces;
+        const vertices = shape.vertices;
+        const upVector = new CANNON.Vec3(0, 1, 0);
+
+        let maxDot = -Infinity;
+        let bestFaceIndex = -1;
+
+        // 각 면의 법선 벡터를 계산하고 위쪽(0,1,0)과 가장 가까운 면을 찾음
+        for (let i = 0; i < faces.length; i++) {
+            const face = faces[i];
+            // 면의 세 점 가져오기 (ConvexPolyhedron은 삼각형 이상의 다각형일 수 있음)
+            const v0 = vertices[face[0]];
+            const v1 = vertices[face[1]];
+            const v2 = vertices[face[2]];
+
+            // 법선 계산: (v1-v0) x (v2-v0)
+            const e1 = new CANNON.Vec3();
+            const e2 = new CANNON.Vec3();
+            const normal = new CANNON.Vec3();
+
+            v1.vsub(v0, e1);
+            v2.vsub(v0, e2);
+            e1.cross(e2, normal);
+            normal.normalize();
+
+            // 로컬 법선을 월드로 변환
+            const worldNormal = body.quaternion.vmult(normal);
+            const dot = worldNormal.dot(upVector);
+
+            if (dot > maxDot) {
+                maxDot = dot;
+                bestFaceIndex = i;
+            }
+        }
+
+        // 찾은 면 인덱스를 결과 값으로 매핑
+        return this.mapFaceIndexToValue(type, bestFaceIndex);
+    }
+
+    /**
+     * 면 인덱스를 주사위 눈금으로 변환
+     */
+    mapFaceIndexToValue(type, faceIndex) {
+        if (type === 'd20') {
+            // DiceRenderer.js의 createD20Materials에 정의된 faceValues 배열과 동일해야 함
+            const d20Map = [1, 20, 2, 19, 3, 18, 4, 17, 5, 16, 6, 15, 7, 14, 8, 13, 9, 12, 10, 11];
+            if (faceIndex >= 0 && faceIndex < d20Map.length) {
+                return d20Map[faceIndex];
+            }
+        }
+
+        // D8은 순차적으로 1~8 할당함
+        return faceIndex + 1;
+    }
+
+    /**
+     * D6 윗면 눈금 계산 (법선 벡터 기반)
+     */
+    getD6Value(body) {
         const upVector = new CANNON.Vec3(0, 1, 0);
         let maxDot = -Infinity;
         let topFace = 1;
@@ -306,6 +511,21 @@ export class DicePhysics {
         });
 
         return topFace;
+    }
+
+    /**
+     * 타입별 랜덤 결과값 생성
+     */
+    getRandomDiceValue(type) {
+        const maxValues = {
+            'd4': 4,
+            'd6': 6,
+            'd8': 8,
+            'd12': 12,
+            'd20': 20
+        };
+        const max = maxValues[type] || 6;
+        return Math.floor(Math.random() * max) + 1;
     }
 
     /**

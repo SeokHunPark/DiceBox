@@ -6,9 +6,11 @@ export class StartUI {
         this.diceCountSlider = document.getElementById('dice-count');
         this.diceCountDisplay = document.getElementById('dice-count-display');
         this.colorPalette = document.getElementById('color-palette');
+        this.diceTypeSelector = document.getElementById('dice-type-selector');
         this.rollBtn = document.getElementById('roll-btn');
 
         this.selectedColor = '#e74c3c';
+        this.selectedType = 'd6'; // 기본 D6
         this.diceCount = 2;
 
         this.onRoll = null; // 콜백 함수
@@ -22,6 +24,23 @@ export class StartUI {
             this.diceCount = parseInt(e.target.value);
             this.diceCountDisplay.textContent = this.diceCount;
         });
+
+        // 주사위 종류 선택 이벤트
+        if (this.diceTypeSelector) {
+            this.diceTypeSelector.addEventListener('click', (e) => {
+                const btn = e.target.closest('.dice-type-btn');
+                if (!btn) return;
+
+                // 기존 선택 해제
+                this.diceTypeSelector.querySelectorAll('.dice-type-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+
+                // 새 선택 활성화
+                btn.classList.add('active');
+                this.selectedType = btn.dataset.type;
+            });
+        }
 
         // 색상 팔레트 이벤트
         this.colorPalette.addEventListener('click', (e) => {
@@ -43,7 +62,8 @@ export class StartUI {
             if (this.onRoll) {
                 this.onRoll({
                     count: this.diceCount,
-                    color: this.selectedColor
+                    color: this.selectedColor,
+                    type: this.selectedType
                 });
             }
         });
@@ -55,7 +75,8 @@ export class StartUI {
     getSettings() {
         return {
             count: this.diceCount,
-            color: this.selectedColor
+            color: this.selectedColor,
+            type: this.selectedType
         };
     }
 
