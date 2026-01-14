@@ -30,7 +30,8 @@ export class DiceRenderer {
         // Renderer
         this.renderer = new THREE.WebGLRenderer({
             canvas: this.canvas,
-            antialias: true
+            antialias: true,
+            preserveDrawingBuffer: true // 캔버스 캡처를 위해 필요
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
