@@ -77,7 +77,6 @@ class DiceBoxApp {
         this.resultOverlay = document.getElementById('result-overlay');
 
         this.resultUI.setOnReroll(() => {
-            soundManager.playRollButtonSound();
             this.hideResultOverlay();
             this.startRolling();
         });
