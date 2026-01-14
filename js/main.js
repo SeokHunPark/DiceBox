@@ -168,9 +168,6 @@ class DiceBoxApp {
 
         const { count, color } = this.currentSettings;
 
-        // Roll 버튼 효과음
-        soundManager.playRollButtonSound();
-
         // Rolling Scene으로 전환
         this.sceneManager.switchTo('rolling');
         this.showRollingIndicator(true);
