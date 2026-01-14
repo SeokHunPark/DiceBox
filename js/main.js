@@ -10,6 +10,7 @@ import { ResultUI } from './ui/ResultUI.js';
 import { i18n } from './i18n/i18n.js';
 import { soundManager } from './audio/SoundManager.js';
 import { ShakeDetector } from './input/ShakeDetector.js';
+import { ShareManager } from './utils/ShareManager.js';
 
 class DiceBoxApp {
     constructor() {
@@ -21,6 +22,7 @@ class DiceBoxApp {
         this.resultOverlay = null;
 
         this.shakeDetector = new ShakeDetector();
+        this.shareManager = null; // ShareManager 추가
         this.isRolling = false;
 
         this.currentSettings = {
@@ -48,6 +50,9 @@ class DiceBoxApp {
         const canvas = document.getElementById('dice-canvas');
         this.diceManager = new DiceManager(canvas);
 
+        // ShareManager 초기화
+        this.shareManager = new ShareManager();
+
         // 🔊 물리 엔진에 충돌 콜백 직접 연결 (캐싱 우회)
         this.diceManager.physics.setOnCollision((type, velocity, x) => {
             soundManager.playCollision(type, velocity, x);
@@ -63,6 +68,59 @@ class DiceBoxApp {
         // this.initShakeDetection();
 
         console.log('🎲 Dice Box initialized!');
+    }
+
+    // ... (중략)
+
+    initResultUI() {
+        this.resultUI = new ResultUI();
+        this.resultOverlay = document.getElementById('result-overlay');
+
+        this.resultUI.setOnReroll(() => {
+            soundManager.playRollButtonSound();
+            this.hideResultOverlay();
+            this.startRolling();
+        });
+
+        this.resultUI.setOnHome(() => {
+            soundManager.playButtonSound();
+            this.hideResultOverlay();
+            this.isRolling = false; // 상태 초기화
+            this.sceneManager.switchTo('start');
+        });
+
+        // 공유 버튼 이벤트 연결
+        const shareBtn = document.getElementById('share-btn');
+        if (shareBtn) {
+            shareBtn.addEventListener('click', () => {
+                soundManager.playButtonSound(); // 버튼음 재생
+
+                // 결과 UI에서 현재 합계를 가져올 수 있다면 텍스트에 포함
+                const totalValue = document.getElementById('total-value').textContent;
+                const shareText = `Total: ${totalValue}`;
+
+                this.shareManager.shareResult(shareText);
+            });
+        }
+
+        // 결과 상세 보기 토글
+        const toggleBtn = document.getElementById('toggle-detail-btn');
+        const diceGroups = document.getElementById('dice-groups');
+
+        if (toggleBtn && diceGroups) {
+            toggleBtn.addEventListener('click', () => {
+                const isCollapsed = diceGroups.classList.contains('collapsed');
+                if (isCollapsed) {
+                    diceGroups.classList.remove('collapsed');
+                    toggleBtn.classList.add('expanded');
+                    soundManager.playToggleSound(); // 찰칵 소리
+                } else {
+                    diceGroups.classList.add('collapsed');
+                    toggleBtn.classList.remove('expanded');
+                    soundManager.playToggleSound(); // 찰칵 소리
+                }
+            });
+        }
     }
 
     /**

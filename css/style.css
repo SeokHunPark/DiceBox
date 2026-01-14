@@ -695,36 +695,52 @@ body {
 }
 
 .action-btn {
-  width: 100%;
-  padding: var(--spacing-md);
-  font-size: 1.125rem;
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  font-size: 1rem;
   font-weight: 600;
-  border: none;
-  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
 }
 
 .action-btn.primary {
+  background: var(--color-primary);
   color: white;
-  background: linear-gradient(135deg, var(--color-accent) 0%, #c0392b 100%);
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
 }
 
 .action-btn.primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(233, 69, 96, 0.3);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
 }
 
 .action-btn.secondary {
-  color: var(--color-text-secondary);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
 }
 
 .action-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
+/* 공유 버튼 전용 스타일 보정 */
+#share-btn {
+  background: rgba(52, 152, 219, 0.15);
+  border-color: rgba(52, 152, 219, 0.3);
+  color: #3498db;
+}
+
+#share-btn:hover {
+  background: rgba(52, 152, 219, 0.25);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+}
 /* ========================================
    Responsive Design
    ======================================== */

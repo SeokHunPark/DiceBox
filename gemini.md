@@ -109,8 +109,9 @@ gantt
     트레이 테마 추가                :p2b, after p1, 1M
     모바일 흔들기 인터랙션          :p2c, after p2a, 1M
     section Phase 3
-    다면체 주사위 (D4~D20)          :p3a, after p2c, 1M
-    설정 프리셋 저장                :p3b, after p3a, 1M
+    결과 공유 기능                :p3a, after p2c, 1M
+    다면체 주사위 (D4~D20)          :p3b, after p3a, 1M
+    설정 프리셋 저장                :p3c, after p3b, 1M
     section Phase 4
     멀티플레이 모드                 :p4, after p3b, 2M
 ```
