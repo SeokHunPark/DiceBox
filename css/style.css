@@ -695,52 +695,49 @@ body {
 }
 
 .action-btn {
-  padding: 12px 24px;
-  border-radius: var(--radius-full);
-  font-size: 1rem;
+  width: 100%;
+  padding: var(--spacing-md);
+  font-size: 1.125rem;
   font-weight: 600;
+  border: none;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-fast);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid transparent;
 }
 
 .action-btn.primary {
-  background: var(--color-primary);
   color: white;
-  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+  background: linear-gradient(135deg, var(--color-accent) 0%, #c0392b 100%);
 }
 
 .action-btn.primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+  box-shadow: 0 8px 25px rgba(233, 69, 96, 0.3);
 }
 
 .action-btn.secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--color-text-primary);
-  border-color: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(5px);
+  color: var(--color-text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
 }
 
 .action-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.1);
 }
 
-/* 공유 버튼 전용 스타일 보정 */
+/* 공유 버튼 전용 스타일 */
 #share-btn {
-  background: rgba(52, 152, 219, 0.15);
-  border-color: rgba(52, 152, 219, 0.3);
-  color: #3498db;
+  background: rgba(52, 152, 219, 0.2);
+  border: 1px solid rgba(52, 152, 219, 0.4);
+  color: #5dade2;
 }
 
 #share-btn:hover {
-  background: rgba(52, 152, 219, 0.25);
+  background: rgba(52, 152, 219, 0.3);
+  transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
 }
+
 /* ========================================
    Responsive Design
    ======================================== */

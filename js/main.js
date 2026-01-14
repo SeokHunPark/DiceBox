@@ -252,65 +252,6 @@ class DiceBoxApp {
         soundManager.setMaterial(theme);
     }
 
-    initResultUI() {
-        this.resultUI = new ResultUI();
-        this.resultOverlay = document.getElementById('result-overlay');
-
-        this.resultUI.setOnReroll(() => {
-            soundManager.playRollButtonSound();
-            this.hideResultOverlay();
-            this.startRolling();
-        });
-
-        this.resultUI.setOnHome(() => {
-            soundManager.playButtonSound();
-            this.hideResultOverlay();
-            this.isRolling = false; // 상태 초기화
-            this.sceneManager.switchTo('start');
-        });
-
-        // 결과 상세 보기 토글
-        const toggleBtn = document.getElementById('toggle-detail-btn');
-        const diceGroups = document.getElementById('dice-groups');
-
-        if (toggleBtn && diceGroups) {
-            toggleBtn.addEventListener('click', () => {
-                const isCollapsed = diceGroups.classList.contains('collapsed');
-                if (isCollapsed) {
-                    diceGroups.classList.remove('collapsed');
-                    toggleBtn.classList.add('expanded');
-                    soundManager.playToggleSound(); // 찰칵 소리
-                } else {
-                    diceGroups.classList.add('collapsed');
-                    toggleBtn.classList.remove('expanded');
-                    soundManager.playToggleSound(); // 찰칵 소리
-                }
-            });
-        }
-    }
-
-    /**
-     * 주사위 굴리기 시작
-     */
-    async startRolling() {
-        const { count, color } = this.currentSettings;
-
-        // Roll 버튼 효과음
-        soundManager.playRollButtonSound();
-
-        // Rolling Scene으로 전환
-        this.sceneManager.switchTo('rolling');
-        this.showRollingIndicator(true);
-
-        // 주사위 색상 설정 및 굴리기
-        this.diceManager.setDiceColor(color);
-        const results = await this.diceManager.roll(count);
-
-        // 결과 표시
-        this.showRollingIndicator(false);
-        this.showResults(results);
-    }
-
     /**
      * 결과 오버레이 표시
      */
